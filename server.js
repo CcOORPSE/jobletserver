@@ -2,6 +2,11 @@ import "./config/loadEnv.js";
 import './config/instrument.js'
 import express from "express";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const clientDistPath = path.join(__dirname, "../client/dist");
 import * as Sentry from "@sentry/node";
 import companyRoutes from './routes/companyRoutes.js'
 import connectCloudinary from './config/cloudinary.js';
@@ -66,9 +71,7 @@ app.use(
 
 app.use(express.json({ limit: "1mb" }));
 app.use("/uploads", express.static("uploads"));
-
-// API only - no client static files (client deployed separately on Vercel)
-app.get("/", (req, res) => res.json({ message: "Joblet Backend API - Running", status: "online" }));
+app.use(express.static(clientDistPath));
 
 app.get("/api/debug-firebase-init", (req, res) => {
   try {
